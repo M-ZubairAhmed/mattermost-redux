@@ -347,6 +347,31 @@ function statuses(state: RelationOneToOne<UserProfile, string> = {}, action: Gen
     }
 }
 
+function customStatuses(state: RelationOneToOne<UserProfile, string> = {}, action: GenericAction) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_STATUS: {
+        const nextState = Object.assign({}, state);
+        nextState[action.data.user_id] = action.data.custom_text;
+
+        return nextState;
+    }
+    case UserTypes.RECEIVED_STATUSES: {
+        const nextState = Object.assign({}, state);
+
+        for (const s of action.data) {
+            nextState[s.user_id] = s.custom_text;
+        }
+
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 function myUserAccessTokens(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN: {
@@ -446,6 +471,8 @@ export default combineReducers({
 
     // object where every key is the user id and has a value with the current status of each user
     statuses,
+
+    customStatuses,
 
     // Total user stats
     stats,
